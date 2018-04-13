@@ -4,33 +4,70 @@ import registerServiceWorker from './registerServiceWorker';
 
 import { observable, action, computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { Button, Intent, Spinner, Navbar, NavbarGroup, NavbarHeading, NavbarDivider, Alignment, Card, Elevation, NonIdealState, Icon } from "@blueprintjs/core";
+import { Button, Intent, Spinner, Navbar, NavbarGroup, NavbarHeading, NavbarDivider, Alignment, Card, Elevation, NonIdealState, Icon, EditableText } from "@blueprintjs/core";
 import { Colors, Text, Classes } from "@blueprintjs/core"
+//@ts-ignore
+import Geocode from "react-geocode";
+
 import './index.css';
 import "@blueprintjs/core/lib/css/blueprint.css";
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
-import { Motion, spring } from 'react-motion';
-import FlipMove from 'react-flip-move';
+import { INIT_TEXT } from './helpers';
+
+import GoogleMap from 'google-map-react';
+
+Geocode.setApiKey("AIzaSyC9_o0oJQXpFqAtoj6I0W4bXsTSBq3bmi4");
+Geocode.enableDebug();
+
 
 class ContentModel {
   @observable text: string
 
-  constructor(text = 'a,b,c') {
+  constructor(text = INIT_TEXT) {
     this.text = text
   }
+}
+interface coordinates {
+  lat: number,
+  lng: number
+}
 
-  @computed get articles() {
-    return this.text.split(',')
-  }
-
+interface MapMarker {
+  name: string;
+  coordinates: coordinates;
 }
 
 class AppState {
   @observable currentContent: ContentModel
+  @observable mapMarkers: Array<MapMarker>
+  @observable mapCenter = {
+    lat: 37.78825, lng: -122.4324
+  }
 
   constructor() {
     this.currentContent = new ContentModel()
+    this.mapMarkers = []
+  }
+
+  processLines(lines: string[]) {
+    
+    // get geocoded addresses
+    lines.map((line: string) => {
+      Geocode.fromAddress(line).then(
+        (response: any) => {
+          const { lat, lng } = response.results[0].geometry.location;
+          console.log(line, lat, lng);
+          if (this.mapMarkers.length === 0){
+            this.mapCenter = { lat: lat, lng: lng }
+          }
+          this.mapMarkers.push({ name: line, coordinates: { lat: lat, lng: lng } })
+        },
+        (error: any) => {
+          console.error(error);
+        }
+      );
+    })
   }
 }
 
@@ -38,27 +75,25 @@ interface Props{
   store: AppState
 }
 
-
-@observer
-export class ContentView extends React.Component<Props>{
+class MapMarkerView extends React.Component<any> {
   render() {
-    const store = this.props.store
     return (
-      <FlipMove enterAnimation="fade" leaveAnimation="fade" duration={200} easing="ease-out">
-              {store.currentContent.articles.map((article,index) => (
-                <div key={article}>{article}</div>
-              ))}
-            </FlipMove>
-    )
+      <div onClick={this.props.onPress} className={'marker'}></div>
+    );
   }
 }
-
 @observer
 export class App extends React.Component<Props>{
+  
   render() {
     const store = this.props.store
-    const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
-      store.currentContent.text = event.currentTarget.value
+    const onStartClick = () => {
+      const lines = store.currentContent.text.split(/\n/)
+      store.processLines(lines)
+    }
+    const markerOnPress = (marker: MapMarker) => {
+      console.log('test123')
+      console.log(marker)
     }
     return (
       <div className={Classes.DARK} style={{minHeight: '1500px'}}>
@@ -71,23 +106,34 @@ export class App extends React.Component<Props>{
           </NavbarGroup>
         </Navbar>
         <div className='content'>
-          <Card interactive={false} elevation={Elevation.FOUR}>
-            <h5><a href="#">Hello World!</a></h5>
-            <p>Card content</p>
-            <ContentView store={store}></ContentView>
-            <Button>Submit</Button>
-          </Card>
+         <div className='container'>
+         <div className='column'>
+              <Card interactive={false} elevation={Elevation.FOUR}>
+                <EditableText multiline minLines={3} value={INIT_TEXT} />
+              </Card>
+         </div>
+            
+
+        <div className='column'>
+              <GoogleMap
+                bootstrapURLKeys={{ key: 'AIzaSyCjXWv_TJqX54dZeLgO0aE3aI5Oll4efuM' }}
+                center={store.mapCenter}
+                zoom={9}
+              >
+               
+                  {store.mapMarkers.map((marker, index) => (
+                    <MapMarkerView key={index}  lat={marker.coordinates.lat} lng={marker.coordinates.lng} />
+                  )
+                  )
+                }
+
+                
+              </GoogleMap>
+          </div>
+            
+         </div>
           
-          <Card interactive={false} elevation={Elevation.ONE}>
-            <NonIdealState>
-              <div className={Classes.NON_IDEAL_STATE_VISUAL + ' ' + Classes.NON_IDEAL_STATE_ICON}>
-                <span className={Classes.iconClass('folder-open') + ' ' + Classes.ICON}></span>
-              </div>
-              <h4 className={Classes.NON_IDEAL_STATE_TITLE}>This is empty</h4>
-              <div className={Classes.NON_IDEAL_STATE_DESCRIPTION}>Add something here</div>
-            </NonIdealState>
-          </Card>
-          <input className={Classes.INPUT} value={store.currentContent.text} onChange={handleChange} />
+          <Button onClick={onStartClick}>Start</Button>
     </div>
       
         

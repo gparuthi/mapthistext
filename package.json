@@ -4,14 +4,15 @@
   "private": true,
   "dependencies": {
     "@blueprintjs/core": "^2.1.1",
-    "@types/react-motion": "0.0.25",
+    "@types/react-motion": "^0.0.25",
+    "google-map-react": "^0.34.0",
     "mobx": "^4.1.0",
     "mobx-react": "^5.0.0",
     "mobx-react-devtools": "^5.0.1",
     "react": "^16.3.1",
-    "react-beautiful-dnd": "^6.0.0",
     "react-dom": "^16.3.1",
-    "react-flip-move": "^3.0.1",
+    "react-geocode": "^0.0.7",
+    "react-geolocated": "^2.3.0",
     "react-motion": "^0.5.2",
     "react-scripts-ts": "2.14.0",
     "react-transition-group": "^2.3.0"
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.9",
+    "@types/google-map-react": "^0.23.3",
     "@types/jest": "^22.2.0",
     "@types/node": "^9.4.7",
     "@types/react": "^16.0.40",

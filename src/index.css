@@ -14,8 +14,41 @@ body {
   /* justify-content: center; */
   min-height: 100vh;
 }
+
+.container {
+  display: flex;
+  flex-direction: row;
+  min-width: 900px;
+  min-height: 80vh;
+}
+
+.column {
+    float: left;
+    width: 50%;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
 .pt-card {
-  margin-bottom: 10px;
-  width: 300px;
-  /* max-width: 300px; */
+  margin: 10px;
+  
+}
+
+.place{  
+  width: 40px;
+  padding: 20px;
+  border: 1px solid blue;
+  background: red;
+  color: yellow; 
+}
+
+.marker {
+  background-image: url('./components/marker.svg');
+  position: absolute;
+  margin: 0;
+  width: 24px;
+  height: 32px;
+  background-size: 100%;
+  z-index: 1000;
 }
