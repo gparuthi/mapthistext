@@ -5,6 +5,7 @@
   "dependencies": {
     "@blueprintjs/core": "^2.1.1",
     "@types/react-motion": "^0.0.25",
+    "gh-pages": "^1.1.0",
     "google-map-react": "^0.34.0",
     "mobx": "^4.1.0",
     "mobx-react": "^5.0.0",
@@ -21,7 +22,9 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.9",
